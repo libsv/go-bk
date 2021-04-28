@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/libsv/go-bt/bsvutil/base58"
+	"github.com/libsv/go-bk/base58"
 )
 
 func BenchmarkBase58Encode(b *testing.B) {

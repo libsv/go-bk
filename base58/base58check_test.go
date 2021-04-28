@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/libsv/go-bt/bsvutil/base58"
+	"github.com/libsv/go-bk/base58"
 )
 
 var checkEncodingStringTests = []struct {

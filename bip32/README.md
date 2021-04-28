@@ -1,17 +1,8 @@
-hdkeychain
+bip32
 ==========
 
-[![Build Status](https://travis-ci.org/bitcoinsv/bsvutil.svg?branch=master)](https://travis-ci.org/bitcoinsv/bsvutil)
-[![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
-[![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/bitcoinsv/bsvutil/hdkeychain)
-
-Package hdkeychain provides an API for bitcoin hierarchical deterministic
+Package bip32 provides an API for bitcoin hierarchical deterministic
 extended keys (BIP0032).
-
-A comprehensive suite of tests is provided to ensure proper functionality.  See
-`test_coverage.txt` for the gocov coverage report.  Alternatively, if you are
-running a POSIX OS, you can run the `cov_report.sh` script for a real-time
-report.
 
 ## Feature Overview
 
@@ -26,8 +17,8 @@ report.
 - Obtaining the underlying EC pubkeys, EC privkeys, and associated bitcoin
   addresses ties in seamlessly with existing bsvec and bsvutil types which
   provide powerful tools for working with them to do things like sign
-  transations and generate payment scripts
-- Uses the bsvec package which is highly optimized for secp256k1
+  transactions and generate payment scripts
+- Uses the bec package which is highly optimized for secp256k1
 - Code examples including:
   - Generating a cryptographically secure random seed and deriving a
     master node from it

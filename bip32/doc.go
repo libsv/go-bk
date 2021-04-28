@@ -66,10 +66,10 @@ public extended key with the Neuter function.  The original extended key is not
 modified.  A public extended key is still capable of deriving non-hardened child
 public extended keys.
 
-Serializing and Deserializing Extended Keys
+Serialising and Deserialising Extended Keys
 
-Extended keys are serialized and deserialized with the String and
-NewKeyFromString functions.  The serialized key is a Base58-encoded string which
+Extended keys are serialised and deserialised with the String and
+NewKeyFromString functions.  The serialised key is a Base58-encoded string which
 looks like the following:
 	public key:   xpub68Gmy5EdvgibQVfPdqkBBSVxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw
 	private key:  xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7
@@ -78,7 +78,8 @@ Network
 
 Extended keys are much like normal Bitcoin addresses in that they have version
 bytes which tie them to a specific network.  The SetNet and IsForNet functions
-are provided to set and determinine which network an extended key is associated
+are provided to set and determine which network an extended key is associated
 with.
 */
+// nolint: lll
 package bip32

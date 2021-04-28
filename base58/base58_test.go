@@ -9,7 +9,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/libsv/go-bt/bsvutil/base58"
+	"github.com/libsv/go-bk/base58"
 )
 
 var stringTests = []struct {

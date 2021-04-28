@@ -62,17 +62,17 @@ func BenchmarkPrivToPub(b *testing.B) {
 	}
 }
 
-// BenchmarkDeserialize benchmarks how long it takes to deserialize a private
+// BenchmarkDeserialise benchmarks how long it takes to deserialize a private
 // extended key.
-func BenchmarkDeserialize(b *testing.B) {
+func BenchmarkDeserialise(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		hdkeychain.NewKeyFromString(bip0032MasterPriv1)
 	}
 }
 
-// BenchmarkSerialize benchmarks how long it takes to serialize a private
+// BenchmarkSerialise benchmarks how long it takes to serialise a private
 // extended key.
-func BenchmarkSerialize(b *testing.B) {
+func BenchmarkSerialise(b *testing.B) {
 	b.StopTimer()
 	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
 	if err != nil {

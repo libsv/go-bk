@@ -18,7 +18,8 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/libsv/go-bk/address"
+	"github.com/libsv/go-bt/bscript"
+
 	"github.com/libsv/go-bk/base58"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/chaincfg"
@@ -44,13 +45,13 @@ const (
 	// a master node.
 	MaxSeedBytes = 64 // 512 bits
 
-	// serializedKeyLen is the length of a serialized public or private
+	// serializedKeyLen is the length of a serialised public or private
 	// extended key.  It consists of 4 bytes version, 1 byte depth, 4 bytes
 	// fingerprint, 4 bytes child number, 32 bytes chain code, and 33 bytes
 	// public/private key data.
 	serializedKeyLen = 4 + 1 + 4 + 4 + 32 + 33 // 78 bytes
 
-	// maxUint8 is the max positive integer which can be serialized in a uint8
+	// maxUint8 is the max positive integer which can be serialised in a uint8
 	maxUint8 = 1<<8 - 1
 )
 
@@ -89,12 +90,12 @@ var (
 		"bits", MinSeedBytes*8, MaxSeedBytes*8)
 
 	// ErrBadChecksum describes an error in which the checksum encoded with
-	// a serialized extended key does not match the calculated value.
+	// a serialised extended key does not match the calculated value.
 	ErrBadChecksum = errors.New("bad extended key checksum")
 
-	// ErrInvalidKeyLen describes an error in which the provided serialized
+	// ErrInvalidKeyLen describes an error in which the provided serialised
 	// key is not the expected length.
-	ErrInvalidKeyLen = errors.New("the provided serialized extended key " +
+	ErrInvalidKeyLen = errors.New("the provided serialised extended key " +
 		"length is invalid")
 )
 
@@ -109,10 +110,10 @@ type ExtendedKey struct {
 	key       []byte // This will be the pubkey for extended pub keys
 	pubKey    []byte // This will only be set for extended priv keys
 	chainCode []byte
-	depth     uint8
 	parentFP  []byte
-	childNum  uint32
 	version   []byte
+	childNum  uint32
+	depth     uint8
 	isPrivate bool
 }
 
@@ -137,7 +138,7 @@ func NewExtendedKey(version, key, chainCode, parentFP []byte, depth uint8,
 	}
 }
 
-// pubKeyBytes returns bytes for the serialized compressed public key associated
+// pubKeyBytes returns bytes for the serialised compressed public key associated
 // with this extended key in an efficient manner including memoization as
 // necessary.
 //
@@ -174,7 +175,7 @@ func (k *ExtendedKey) IsPrivate() bool {
 // Depth returns the current derivation level with respect to the root.
 //
 // The root key has depth zero, and the field has a maximum of 255 due to
-// how depth is serialized.
+// how depth is serialised.
 func (k *ExtendedKey) Depth() uint8 {
 	return k.depth
 }
@@ -255,7 +256,9 @@ func (k *ExtendedKey) Child(i uint32) (*ExtendedKey, error) {
 	// data:
 	//   I = HMAC-SHA512(Key = chainCode, Data = data)
 	hmac512 := hmac.New(sha512.New, k.chainCode)
-	hmac512.Write(data)
+	if _, err := hmac512.Write(data); err != nil {
+		return nil, err
+	}
 	ilr := hmac512.Sum(nil)
 
 	// Split "I" into two 32-byte sequences Il and Ir where:
@@ -305,7 +308,7 @@ func (k *ExtendedKey) Child(i uint32) (*ExtendedKey, error) {
 			return nil, ErrInvalidChild
 		}
 
-		// Convert the serialized compressed parent public key into X
+		// Convert the serialised compressed parent public key into X
 		// and Y coordinates so it can be added to the intermediate
 		// public key.
 		pubKey, err := bec.ParsePubKey(k.key, bec.S256())
@@ -377,9 +380,9 @@ func (k *ExtendedKey) ECPrivKey() (*bec.PrivateKey, error) {
 
 // Address converts the extended key to a standard bitcoin pay-to-pubkey-hash
 // address for the passed network.
-func (k *ExtendedKey) Address(net *chaincfg.Params) (*address.AddressPubKeyHash, error) {
+func (k *ExtendedKey) Address(net *chaincfg.Params) (*bscript.Address, error) {
 	pkHash := crypto.Hash160(k.pubKeyBytes())
-	return address.NewAddressPubKeyHash(pkHash, net)
+	return bscript.NewAddressFromPublicKeyHash(pkHash, net.Name == chaincfg.NetworkMain)
 }
 
 // paddedAppend appends the src byte slice to dst, returning the new slice.
@@ -401,7 +404,7 @@ func (k *ExtendedKey) String() string {
 	var childNumBytes [4]byte
 	binary.BigEndian.PutUint32(childNumBytes[:], k.childNum)
 
-	// The serialized format is:
+	// The serialised format is:
 	//   version (4) || depth (1) || parent fingerprint (4)) ||
 	//   child num (4) || chain code (32) || key data (33) || checksum (4)
 	serializedBytes := make([]byte, 0, serializedKeyLen+4)
@@ -481,7 +484,9 @@ func NewMaster(seed []byte, net *chaincfg.Params) (*ExtendedKey, error) {
 	// First take the HMAC-SHA512 of the master key and the seed data:
 	//   I = HMAC-SHA512(Key = "Bitcoin seed", Data = S)
 	hmac512 := hmac.New(sha512.New, masterKey)
-	hmac512.Write(seed)
+	if _, err := hmac512.Write(seed); err != nil {
+		return nil, err
+	}
 	lr := hmac512.Sum(nil)
 
 	// Split "I" into two 32-byte sequences Il and Ir where:
@@ -504,14 +509,14 @@ func NewMaster(seed []byte, net *chaincfg.Params) (*ExtendedKey, error) {
 // NewKeyFromString returns a new extended key instance from a base58-encoded
 // extended key.
 func NewKeyFromString(key string) (*ExtendedKey, error) {
-	// The base58-decoded extended key must consist of a serialized payload
+	// The base58-decoded extended key must consist of a serialised payload
 	// plus an additional 4 bytes for the checksum.
 	decoded := base58.Decode(key)
 	if len(decoded) != serializedKeyLen+4 {
 		return nil, ErrInvalidKeyLen
 	}
 
-	// The serialized format is:
+	// The serialised format is:
 	//   version (4) || depth (1) || parent fingerprint (4)) ||
 	//   child num (4) || chain code (32) || key data (33) || checksum (4)
 
@@ -531,7 +536,7 @@ func NewKeyFromString(key string) (*ExtendedKey, error) {
 	chainCode := payload[13:45]
 	keyData := payload[45:78]
 
-	// The key data is a private key if it starts with 0x00.  Serialized
+	// The key data is a private key if it starts with 0x00.  Serialised
 	// compressed pubkeys either start with 0x02 or 0x03.
 	isPrivate := keyData[0] == 0x00
 	if isPrivate {

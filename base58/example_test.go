@@ -7,7 +7,7 @@ package base58_test
 import (
 	"fmt"
 
-	"github.com/libsv/go-bt/bsvutil/base58"
+	"github.com/libsv/go-bk/base58"
 )
 
 // This example demonstrates how to decode modified base58 encoded data.

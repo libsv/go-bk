@@ -8,8 +8,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/libsv/go-bt/bec"
-	"github.com/libsv/go-bt/crypto"
+	"github.com/libsv/go-bk/bec"
+	"github.com/libsv/go-bk/crypto"
 )
 
 const message = "test message"
