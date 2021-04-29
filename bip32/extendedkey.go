@@ -550,8 +550,7 @@ func NewKeyFromString(key string) (*ExtendedKey, error) {
 	} else {
 		// Ensure the public key parses correctly and is actually on the
 		// secp256k1 curve.
-		_, err := bec.ParsePubKey(keyData, bec.S256())
-		if err != nil {
+		if _, err := bec.ParsePubKey(keyData, bec.S256()); err != nil {
 			return nil, err
 		}
 	}
@@ -573,8 +572,7 @@ func GenerateSeed(length uint8) ([]byte, error) {
 	}
 
 	buf := make([]byte, length)
-	_, err := rand.Read(buf)
-	if err != nil {
+	if _, err := rand.Read(buf); err != nil {
 		return nil, err
 	}
 
