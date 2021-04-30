@@ -648,16 +648,11 @@ func TestExtendedKeyAPI(t *testing.T) {
 			continue
 		}
 
-		addr, err := key.Address(&chaincfg.MainNet)
-		if err != nil {
-			t.Errorf("Address #%d (%s): unexpected error: %v", i,
-				test.name, err)
-			continue
-		}
-		if addr.AddressString != test.address {
+		addr := key.Address(&chaincfg.MainNet)
+		if addr != test.address {
 			t.Errorf("Address #%d (%s): mismatched address -- want "+
 				"%s, got %s", i, test.name, test.address,
-				addr.AddressString)
+				addr)
 			continue
 		}
 	}
@@ -826,16 +821,11 @@ func TestZero(t *testing.T) {
 		}
 
 		wantAddr := "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E"
-		addr, err := key.Address(&chaincfg.MainNet)
-		if err != nil {
-			t.Errorf("Address #%d (%s): unexpected error: %v", i,
-				testName, err)
-			return false
-		}
-		if addr.AddressString != wantAddr {
+		addr := key.Address(&chaincfg.MainNet)
+		if addr != wantAddr {
 			t.Errorf("Address #%d (%s): mismatched address -- want "+
 				"%s, got %s", i, testName, wantAddr,
-				addr.AddressString)
+				addr)
 			return false
 		}
 

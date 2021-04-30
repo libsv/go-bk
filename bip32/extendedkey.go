@@ -18,8 +18,6 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/libsv/go-bt/bscript"
-
 	"github.com/libsv/go-bk/base58"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/chaincfg"
@@ -380,9 +378,33 @@ func (k *ExtendedKey) ECPrivKey() (*bec.PrivateKey, error) {
 
 // Address converts the extended key to a standard bitcoin pay-to-pubkey-hash
 // address for the passed network.
-func (k *ExtendedKey) Address(net *chaincfg.Params) (*bscript.Address, error) {
-	pkHash := crypto.Hash160(k.pubKeyBytes())
-	return bscript.NewAddressFromPublicKeyHash(pkHash, net.Name == chaincfg.NetworkMain)
+func (k *ExtendedKey) Address(net *chaincfg.Params) string {
+	return k.addressFromPublicKeyHash(crypto.Hash160(k.pubKeyBytes()), net.Name == chaincfg.NetworkMain)
+}
+
+// addressFromPublicKeyHash is copied from the bt.bscript package to remove a small
+// dependency from bk -> bt. Adding this means bk has no dependency on bt.
+func (k *ExtendedKey) addressFromPublicKeyHash(hash []byte, mainnet bool) string {
+	// regtest := 111
+	// mainnet: 0
+
+	bb := make([]byte, 1)
+	if !mainnet {
+		bb[0] = 111
+	}
+
+	bb = append(bb, hash...)
+	b := make([]byte, 0, len(bb)+4)
+	b = append(b, bb[:]...)
+	ckSum := k.checksum(b)
+	b = append(b, ckSum[:]...)
+	return base58.Encode(b)
+}
+
+func (k *ExtendedKey) checksum(input []byte) (ckSum [4]byte) {
+	h := crypto.Sha256d(input)
+	copy(ckSum[:], h[:4])
+	return
 }
 
 // paddedAppend appends the src byte slice to dst, returning the new slice.
