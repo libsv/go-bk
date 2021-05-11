@@ -44,7 +44,7 @@ func TestPublicKey_DerivationPath(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			key, err := DeriveChildFromKey(rootKey, test.derivationPath)
+			key, err := rootKey.DeriveChildFromKey(test.derivationPath)
 			if test.err != nil {
 				assert.Nil(t, key)
 				assert.Error(t, err)
@@ -53,7 +53,7 @@ func TestPublicKey_DerivationPath(t *testing.T) {
 			}
 			assert.NotNil(t, key)
 			assert.NoError(t, err)
-			addr, err := PublicKey(key, false)
+			addr, err := key.ToPublicKey()
 			assert.NoError(t, err)
 			assert.Equal(t, test.expAddress, addr.Address)
 		})

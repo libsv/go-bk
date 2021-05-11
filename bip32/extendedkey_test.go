@@ -16,6 +16,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/libsv/go-bk/chaincfg"
 )
 
@@ -648,8 +650,9 @@ func TestExtendedKeyAPI(t *testing.T) {
 			continue
 		}
 
-		addr := key.Address(&chaincfg.MainNet)
-		if addr != test.address {
+		addr, err := key.ToPublicKey()
+		assert.NoError(t, err)
+		if addr.Address != test.address {
 			t.Errorf("Address #%d (%s): mismatched address -- want "+
 				"%s, got %s", i, test.name, test.address,
 				addr)
@@ -821,8 +824,9 @@ func TestZero(t *testing.T) {
 		}
 
 		wantAddr := "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E"
-		addr := key.Address(&chaincfg.MainNet)
-		if addr != wantAddr {
+		addr, err := key.ToPublicKeyWithNet(true)
+		assert.NoError(t, err)
+		if addr.Address != wantAddr {
 			t.Errorf("Address #%d (%s): mismatched address -- want "+
 				"%s, got %s", i, testName, wantAddr,
 				addr)
@@ -845,6 +849,7 @@ func TestZero(t *testing.T) {
 				i, test.name, err)
 			continue
 		}
+
 		neuteredKey, err := key.Neuter()
 		if err != nil {
 			t.Errorf("Neuter #%d (%s): unexpected error: %v", i,

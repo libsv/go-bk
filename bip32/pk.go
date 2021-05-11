@@ -9,6 +9,7 @@ import (
 
 	"github.com/libsv/go-bk/base58"
 	"github.com/libsv/go-bk/bec"
+	"github.com/libsv/go-bk/chaincfg"
 	"github.com/libsv/go-bk/crypto"
 )
 
@@ -17,28 +18,47 @@ var (
 )
 
 // PublicKey defines a single public key and public address.
-type PubKey struct {
+type PublicKey struct {
 	PublicKey []byte
 	Address   string
 }
 
-// PublicKey will take a private key and derive the public key, returning the address string and bytes.
-// mainnet will determine if this is a main or testnet address and return the correct prefix accordingly.
-func PublicKey(privateKey *ExtendedKey, mainnet bool) (*PubKey, error) {
-	pub, err := privateKey.ECPubKey()
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert key to public key %w", err)
+// ToPublicKey will return the public key for the current extendedkey.
+// An appropriate mainnet or testnet address is determined by the ExtendedKey settings.
+//
+// If you are using a Zeroed ExtendedKey, use the ToPublicKeyWithNet method.
+func (k *ExtendedKey) ToPublicKey() (*PublicKey, error) {
+	return k.ToPublicKeyWithNet(k.IsForNet(&chaincfg.MainNet))
+}
+
+// ToPublicKeyWithNet will return the public key for the current extendedkey.
+// This takes a mainnet param that if true will return a mainnet address, otherwise
+// a testnet address is returned.
+//
+// This method should only be used if you are dealing with a Zeroed ExtendedKey as it
+// cannot determine the network to use. Instead for most instances use ToPublicKey.
+func (k *ExtendedKey) ToPublicKeyWithNet(mainnet bool) (*PublicKey, error) {
+	var pubKeyBytes []byte
+	if k.key == nil { // can be nil if this is a Zeroed ExtendedKey.
+		pubKeyBytes = k.pubKeyBytes()
+	} else {
+		pub, err := k.ECPubKey()
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert key to public key %w", err)
+		}
+		pubKeyBytes = pub.SerialiseCompressed()
+		publicKey, err := bec.ParsePubKey(pubKeyBytes, bec.S256())
+		if err != nil {
+			return nil, err
+		}
+		pubKeyBytes = publicKey.SerialiseCompressed()
 	}
-	k := pub.SerialiseCompressed()
-	publicKey, err := bec.ParsePubKey(k, bec.S256())
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse public key %w", err)
-	}
-	hash := crypto.Hash160(publicKey.SerialiseCompressed())
+	hash := crypto.Hash160(pubKeyBytes)
 	bb := make([]byte, 1)
 	if !mainnet {
 		bb[0] = 111
 	}
+	// nolint: makezero // this is required
 	bb = append(bb, hash...)
 	addr := base58EncodeMissingChecksum(bb)
 
@@ -46,8 +66,8 @@ func PublicKey(privateKey *ExtendedKey, mainnet bool) (*PubKey, error) {
 	if size < 26 || size > 34 {
 		return nil, errors.New("incorrect bitcoin address size")
 	}
-	return &PubKey{
-		PublicKey: k,
+	return &PublicKey{
+		PublicKey: pubKeyBytes,
 		Address:   addr,
 	}, nil
 }
@@ -56,9 +76,9 @@ func PublicKey(privateKey *ExtendedKey, mainnet bool) (*PubKey, error) {
 // derivationPath.
 // Child keys must be ints or hardened keys followed by '.
 // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
-func DeriveChildFromKey(startingKey *ExtendedKey, derivationPath string) (*ExtendedKey, error) {
+func (k *ExtendedKey) DeriveChildFromKey(derivationPath string) (*ExtendedKey, error) {
 	if derivationPath == "" {
-		return startingKey, nil
+		return k, nil
 	}
 	children := strings.Split(derivationPath, "/")
 	for _, child := range children {
@@ -69,12 +89,12 @@ func DeriveChildFromKey(startingKey *ExtendedKey, derivationPath string) (*Exten
 		if err != nil {
 			return nil, err
 		}
-		startingKey, err = startingKey.Child(childInt)
+		k, err = k.Child(childInt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to derive child from key %w", err)
 		}
 	}
-	return startingKey, nil
+	return k, nil
 }
 
 func isValidSegment(child string) bool {
