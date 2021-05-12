@@ -650,7 +650,7 @@ func TestExtendedKeyAPI(t *testing.T) {
 			continue
 		}
 
-		addr, err := key.ToPublicKey()
+		addr, err := key.ToAddress()
 		assert.NoError(t, err)
 		if addr.Address != test.address {
 			t.Errorf("Address #%d (%s): mismatched address -- want "+
@@ -824,7 +824,7 @@ func TestZero(t *testing.T) {
 		}
 
 		wantAddr := "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E"
-		addr, err := key.ToPublicKeyWithNet(true)
+		addr, err := key.ToAddressWithNet(true)
 		assert.NoError(t, err)
 		if addr.Address != wantAddr {
 			t.Errorf("Address #%d (%s): mismatched address -- want "+

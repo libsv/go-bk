@@ -23,21 +23,21 @@ type PublicKey struct {
 	Address   string
 }
 
-// ToPublicKey will return the public key for the current extendedkey.
+// ToAddress will return the publicKey bytes for the current extendedkey as well as the address.
 // An appropriate mainnet or testnet address is determined by the ExtendedKey settings.
 //
-// If you are using a Zeroed ExtendedKey, use the ToPublicKeyWithNet method.
-func (k *ExtendedKey) ToPublicKey() (*PublicKey, error) {
-	return k.ToPublicKeyWithNet(k.IsForNet(&chaincfg.MainNet))
+// If you are using a Zeroed ExtendedKey, use the ToAddressWithNet method.
+func (k *ExtendedKey) ToAddress() (*PublicKey, error) {
+	return k.ToAddressWithNet(k.IsForNet(&chaincfg.MainNet))
 }
 
-// ToPublicKeyWithNet will return the public key for the current extendedkey.
-// This takes a mainnet param that if true will return a mainnet address, otherwise
+// ToAddressWithNet will return the publicKey bytes for the current extendedkey as well as the address.
+// This takes a mainnet param that if true will return a mainnet address (prefixed with 1), otherwise
 // a testnet address is returned.
 //
 // This method should only be used if you are dealing with a Zeroed ExtendedKey as it
-// cannot determine the network to use. Instead for most instances use ToPublicKey.
-func (k *ExtendedKey) ToPublicKeyWithNet(mainnet bool) (*PublicKey, error) {
+// cannot determine the network to use. Instead for most instances use ToAddress.
+func (k *ExtendedKey) ToAddressWithNet(mainnet bool) (*PublicKey, error) {
 	var pubKeyBytes []byte
 	if k.key == nil { // can be nil if this is a Zeroed ExtendedKey.
 		pubKeyBytes = k.pubKeyBytes()

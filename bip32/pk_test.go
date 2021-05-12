@@ -53,7 +53,7 @@ func TestPublicKey_DerivationPath(t *testing.T) {
 			}
 			assert.NotNil(t, key)
 			assert.NoError(t, err)
-			addr, err := key.ToPublicKey()
+			addr, err := key.ToAddress()
 			assert.NoError(t, err)
 			assert.Equal(t, test.expAddress, addr.Address)
 		})
