@@ -8,7 +8,7 @@ import (
 // https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt
 var English = strings.Split(strings.TrimSpace(english), "\n")
 
-// nolint:misspell // known word list has american spellings
+//nolint:misspell // known word list has american spellings
 var english = `abandon
 ability
 able
