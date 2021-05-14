@@ -38,7 +38,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Tests
-        run: make test-ci
+        run: make test-unit
       - name: Update code coverage
         run: bash <(curl -s https://codecov.io/bash)
       - name: Build
