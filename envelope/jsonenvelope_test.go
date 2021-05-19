@@ -1,9 +1,8 @@
-package jsonenvelope
+package envelope
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -147,9 +146,7 @@ func TestNewJSONEnvelope_signAndCheckValid(t *testing.T) {
 			assert.NoError(t, err)
 			val, valErr := env.IsValid()
 			assert.NoError(t, valErr)
-			fmt.Println(fmt.Sprintf("%+v", env))
-			fmt.Println(fmt.Sprintf("%s", *env.Signature))
-			fmt.Println(fmt.Sprintf("%s", *env.PublicKey))
+			assert.True(t, val)
 			// convert to json then decode and retry validation
 			bb, err := json.Marshal(env)
 			assert.NoError(t, err)
