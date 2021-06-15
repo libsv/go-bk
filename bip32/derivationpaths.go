@@ -7,21 +7,22 @@ import (
 	"strings"
 )
 
-// DerivePath given a seed will generate a hardened BIP32 path 3 layers deep.
+// DerivePath given an uint64 number will generate a hardened BIP32 path 3 layers deep.
 //
 // This is achieved by the following process:
 // We split the seed bits into 3 sections: (b63-b32|b32-b1|b1-b0)
 // Each section is then added onto 2^31 and concatenated together which will give us the final path.
-func DerivePath(seed uint64) string {
-	path := fmt.Sprintf("%d/", seed>>32|1<<31)
-	path += fmt.Sprintf("%d/", ((seed<<32)>>34)|1<<31)
-	path += fmt.Sprintf("%d", (seed&3)|1<<31)
+func DerivePath(i uint64) string {
+	path := fmt.Sprintf("%d/", i>>32|1<<31)
+	path += fmt.Sprintf("%d/", ((i<<32)>>34)|1<<31)
+	path += fmt.Sprintf("%d", (i&3)|1<<31)
 	return path
 }
 
-// DeriveSeed when given a derivation path of format 0/0/0 will return the seed used to generate
+// DeriveNumber when given a derivation path of format 0/0/0 will
+// reverse the DerivePath function and return the number used to generate
 // the path.
-func DeriveSeed(path string) (uint64, error) {
+func DeriveNumber(path string) (uint64, error) {
 	ss := strings.Split(path, "/")
 	if len(ss) != 3 {
 		return 0, errors.New("path must have 3 levels ie 0/0/0")

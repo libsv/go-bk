@@ -50,7 +50,7 @@ func Test_DerivePathAndDeriveSeed(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			assert.Equal(t, test.exp, DerivePath(test.counter))
 			// assert the path can be converted correctly back to the seed.
-			c, _ := DeriveSeed(test.exp)
+			c, _ := DeriveNumber(test.exp)
 			assert.Equal(t, test.counter, c)
 		})
 	}
@@ -96,7 +96,7 @@ func TestDeriveSeed(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			_, err := DeriveSeed(test.path)
+			_, err := DeriveNumber(test.path)
 			assert.Equal(t, test.err, err)
 		})
 	}
