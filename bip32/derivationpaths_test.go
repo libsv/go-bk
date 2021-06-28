@@ -31,19 +31,19 @@ func Test_DerivePathAndDeriveSeed(t *testing.T) {
 		}, "max int * 2 should return 1 with root path": {
 			counter:      (math.MaxInt32 * 10000) + 172732732,
 			startingPath: "",
-			exp:          "2147488648/2190664331/2147483648",
+			exp:          "2147486148/2190664331/2147483648",
 		}, "max int squared should return 0/0 path": {
 			counter:      (math.MaxInt32 * math.MaxInt32) + 172732732,
 			startingPath: "",
-			exp:          "3221225471/2190666831/2147483649",
+			exp:          "2684354559/3264408655/2147483649",
 		}, "max int squared + 100 should return correct path": {
 			counter:      (math.MaxInt32*math.MaxInt32 + (math.MaxInt32 * 100)) + 172732732,
 			startingPath: "",
-			exp:          "3221225521/2190666806/2147483649",
+			exp:          "2684354584/3264408630/2147483649",
 		}, "max int squared plus two int32 should return correct path": {
 			counter:      ((math.MaxInt32 * math.MaxInt32 * 1) + (math.MaxInt32 * 2)) + 172732732,
 			startingPath: "",
-			exp:          "3221225472/2190666830/2147483651",
+			exp:          "2684354560/2190666830/2147483651",
 		},
 	}
 	for name, test := range tests {
