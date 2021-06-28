@@ -13,8 +13,8 @@ import (
 // We split the seed bits into 3 sections: (b63-b32|b32-b1|b1-b0)
 // Each section is then added onto 2^31 and concatenated together which will give us the final path.
 func DerivePath(i uint64) string {
-	path := fmt.Sprintf("%d/", i>>32|1<<31)
-	path += fmt.Sprintf("%d/", ((i<<32)>>34)|1<<31)
+	path := fmt.Sprintf("%d/", i>>33|1<<31)
+	path += fmt.Sprintf("%d/", ((i<<31)>>33)|1<<31)
 	path += fmt.Sprintf("%d", (i&3)|1<<31)
 	return path
 }
@@ -31,7 +31,7 @@ func DeriveNumber(path string) (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
-	seed := (d1 - 1<<31) << 32
+	seed := (d1 - 1<<31) << 33
 	d2, err := strconv.ParseUint(ss[1], 10, 32)
 	if err != nil {
 		return 0, err
