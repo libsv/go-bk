@@ -50,11 +50,11 @@ func DeriveNumber(path string) (uint64, error) {
 	return seed, nil
 }
 
-// DeriveKeyFromPath will generate a new extended key derived from the key k using the
+// DeriveChildFromPath will generate a new extended key derived from the key k using the
 // bip32 path provided, ie "1234/0/123"
 // Child keys must be ints or hardened keys followed by '.
 // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
-func (k *ExtendedKey) DeriveKeyFromPath(derivationPath string) (*ExtendedKey, error) {
+func (k *ExtendedKey) DeriveChildFromPath(derivationPath string) (*ExtendedKey, error) {
 	if derivationPath == "" {
 		return k, nil
 	}
@@ -80,7 +80,7 @@ func (k *ExtendedKey) DeriveKeyFromPath(derivationPath string) (*ExtendedKey, er
 // bip32 path provided, ie "1234/0/123". It will then transform to an bec.PublicKey before
 // serialising the bytes and returning.
 func (k *ExtendedKey) DerivePublicKeyFromPath(derivationPath string) ([]byte, error) {
-	key, err := k.DeriveKeyFromPath(derivationPath)
+	key, err := k.DeriveChildFromPath(derivationPath)
 	if err != nil {
 		return nil, err
 	}

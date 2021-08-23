@@ -165,7 +165,7 @@ func Test_DeriveChildFromPath(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			k, err := test.key.DeriveKeyFromPath(test.path)
+			k, err := test.key.DeriveChildFromPath(test.path)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expPriv, k.String())
 			pubKey, err := k.Neuter()
