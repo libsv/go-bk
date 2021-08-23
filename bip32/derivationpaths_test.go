@@ -101,3 +101,76 @@ func TestDeriveSeed(t *testing.T) {
 		})
 	}
 }
+
+func Test_DeriveChildFromPath(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		key     *ExtendedKey
+		path    string
+		expPriv string
+		expPub  string
+		err     error
+	}{
+		"successful run, 1 level child, should return no errors": {
+			key: func() *ExtendedKey {
+				k, err := NewKeyFromString("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi")
+				assert.NoError(t, err)
+				return k
+			}(),
+			path:    "0/1",
+			expPriv: "xprv9ww7sMFLzJMzy7bV1qs7nGBxgKYrgcm3HcJvGb4yvNhT9vxXC7eX7WVULzCfxucFEn2TsVvJw25hH9d4mchywguGQCZvRgsiRaTY1HCqN8G",
+			expPub:  "xpub6AvUGrnEpfvJBbfx7sQ89Q8hEMPM65UteqEX4yUbUiES2jHfjexmfJoxCGSwFMZiPBaKQT1RiKWrKfuDV4vpgVs4Xn8PpPTR2i79rwHd4Zr",
+			err:     nil,
+		}, "successful run, 2 level child, should return no errors": {
+			key: func() *ExtendedKey {
+				k, err := NewKeyFromString("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi")
+				assert.NoError(t, err)
+				return k
+			}(),
+			path:    "0/1/100000",
+			expPriv: "xprv9xrdP7iD2MKJthXr1NiyGJ5KqmD2sLbYYFi49AMq9bXrKJGKBnjx5ivSzXRfLhXxzQNsqCi51oUjniwGemvfAZpzpAGohpzFkat42ohU5bR",
+			expPub:  "xpub6BqyndF6risc7BcK7QFydS24Po3XGoKPuUdewYmShw4qC6bTjL4CdXEvqow6yhsfAtvU8e6kHPNFM2LzeWwKQoJm6hrYttTcxVQrk42WRE3",
+			err:     nil,
+		}, "successful run, 10 level child, should return no errors": {
+			key: func() *ExtendedKey {
+				k, err := NewKeyFromString("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi")
+				assert.NoError(t, err)
+				return k
+			}(),
+			path:    "0/1/1/1/1/1/1/1/1/2147483647",
+			expPriv: "xprvAD89K3nZjaG8NqELN8Ce2ATWTcRADLH6JTbrXoVJT6eBRbMwbG7J75v3ym4tGC7X3Mih5krQF77pGi6GNdvxfNcr6WqYacHCSa6uzotoAx2",
+			expPub:  "xpub6S7ViZKTZwpRbKJoU9jePJQF1eFecnzwfgXTLBtv1SBAJPh68oRYetEXq1RvGzsYnTzeikfdM5UM3WDrSZxuBrJi5nLpGxsuSE6cDE8pB2o",
+			err:     nil,
+		}, "successful run, 1 level, hardened": {
+			key: func() *ExtendedKey {
+				k, err := NewKeyFromString("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi")
+				assert.NoError(t, err)
+				return k
+			}(),
+			path:    "0/1'",
+			expPriv: "xprv9ww7sMFVKxty8iXvY7Yn2NyvHZ2CgEoAYXmvf2a4XvkhzBUBmYmaMWyjyAhSxgyKK4zYzbJT6hT4JeGW5fFcNaYsBsBR9a8TxVX1LJQiZ1P",
+			expPub:  "xpub6AvUGrnPALTGMCcPe95nPWveqarh5hX1ukhXTQyg6GHgryoLK65puKJDpTcMBKJKdtXQYVwbK3zMgydcTcf5qpLpJcULu9hKUxx5rzgYhrk",
+			err:     nil,
+		}, "successful run, 3 level, hardened": {
+			key: func() *ExtendedKey {
+				k, err := NewKeyFromString("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi")
+				assert.NoError(t, err)
+				return k
+			}(),
+			path:    "10/1'/1000'/15'",
+			expPriv: "xprvA1bKm9LnkQbMvUW6kwKDLFapT9V9vTeh9D9VnVSJhRf8KmqQTc9W5YboNYcUUkZLreNq1NmeuPpw8x86C87gGyxyV6jNBV4kztFrPdSWz2t",
+			expPub:  "xpub6EagAesgan9f8xaZrxrDhPXZ1BKeKvNYWS56asqvFmC7CaAZ19TkdLvHDrzubSMiC6tAqTMcumVFkgT2duhZncV3KieshEDHNc4jPWkRMGD",
+			err:     nil,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			k, err := test.key.DeriveChildFromPath(test.path)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expPriv, k.String())
+			pubKey, err := k.Neuter()
+			assert.NoError(t, err)
+			assert.Equal(t, test.expPub, pubKey.String())
+		})
+	}
+}
