@@ -52,23 +52,25 @@ func DeriveNumber(path string) (uint64, error) {
 
 // DeriveKeyFromPath will generate a new extended key derived from the key k using the
 // bip32 path provided, ie "1234/0/123"
-func (k *ExtendedKey) DeriveChildFromPath(path string) (*ExtendedKey, error) {
+// Child keys must be ints or hardened keys followed by '.
+// https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
+func (k *ExtendedKey) DeriveKeyFromPath(derivationPath string) (*ExtendedKey, error) {
+	if derivationPath == "" {
+		return k, nil
+	}
 	key := k
-	if path != "" {
-		children := strings.Split(path, "/")
-		for _, child := range children {
-			if !numericPlusTick.MatchString(child) {
-				return nil, fmt.Errorf("invalid path: %q", path)
-			}
-			childInt, err := getChildInt(child)
-			if err != nil {
-				return nil, fmt.Errorf("derive key failed %w", err)
-			}
-			var childErr error
-			key, childErr = key.Child(childInt)
-			if childErr != nil {
-				return nil, fmt.Errorf("derive key failed %w", childErr)
-			}
+	children := strings.Split(derivationPath, "/")
+	for _, child := range children {
+		if !numericPlusTick.MatchString(child) {
+			return nil, fmt.Errorf("invalid path: %q", derivationPath)
+		}
+		childInt, err := childInt(child)
+		if err != nil {
+			return nil, fmt.Errorf("derive key failed %w", err)
+		}
+		key, err = key.Child(childInt)
+		if err != nil {
+			return nil, fmt.Errorf("derive key failed %w", err)
 		}
 	}
 	return key, nil
@@ -77,8 +79,8 @@ func (k *ExtendedKey) DeriveChildFromPath(path string) (*ExtendedKey, error) {
 // DerivePublicKeyFromPath will generate a new extended key derived from the key k using the
 // bip32 path provided, ie "1234/0/123". It will then transform to an bec.PublicKey before
 // serialising the bytes and returning.
-func (k *ExtendedKey) DerivePublicKeyFromPath(path string) ([]byte, error) {
-	key, err := k.DeriveChildFromPath(path)
+func (k *ExtendedKey) DerivePublicKeyFromPath(derivationPath string) ([]byte, error) {
+	key, err := k.DeriveKeyFromPath(derivationPath)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +91,7 @@ func (k *ExtendedKey) DerivePublicKeyFromPath(path string) ([]byte, error) {
 	return pubKey.SerialiseCompressed(), nil
 }
 
-func getChildInt(child string) (uint32, error) {
+func childInt(child string) (uint32, error) {
 	var suffix uint32
 	if strings.HasSuffix(child, "'") {
 		child = strings.TrimRight(child, "'")
