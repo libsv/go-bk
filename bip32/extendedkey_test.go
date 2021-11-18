@@ -12,8 +12,10 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math"
 	"reflect"
+	"sync"
 	"testing"
 
 	"github.com/libsv/go-bk/chaincfg"
@@ -921,4 +923,22 @@ func TestMaximumDepth(t *testing.T) {
 	if noKey != nil {
 		t.Fatal("Child: deriving 256th key should not succeed")
 	}
+}
+
+func Test_pubKeyBytes_race(t *testing.T) {
+	t.Parallel()
+	extKey, err := NewMaster([]byte(`abcd1234abcd1234abcd1234abcd1234`), &chaincfg.MainNet)
+	if err != nil {
+		t.Fatalf("NewMaster: unexpected error: %v", err)
+	}
+	wg := sync.WaitGroup{}
+	for i := 0; i < 10000; i++ {
+		wg.Add(1)
+		go func(c int) {
+			defer wg.Done()
+			extKey.pubKeyBytes()
+			extKey.DeriveChildFromPath(fmt.Sprintf("0/0/%d", c))
+		}(i)
+	}
+	wg.Wait()
 }
