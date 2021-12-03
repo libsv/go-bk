@@ -13,6 +13,7 @@ pull_request_rules:
       - check-success='build (1.16.x, macos-latest)'
       - check-success='build (1.17.x, macos-latest)'
       - check-success='lint (1.16.x, ubuntu-latest)'
+      - check-success='lint (1.17.x, ubuntu-latest)'
       - check-success='lint (1.16.x, macos-latest)'
       - check-success='lint (1.17.x, macos-latest)'
       - check-success='Analyze (go)'
@@ -31,6 +32,7 @@ pull_request_rules:
       - check-success='build (1.16.x, macos-latest)'
       - check-success='build (1.17.x, macos-latest)'
       - check-success='lint (1.16.x, ubuntu-latest)'
+      - check-success='lint (1.17.x, ubuntu-latest)'
       - check-success='lint (1.16.x, macos-latest)'
       - check-success='lint (1.17.x, macos-latest)'
       - check-success='Analyze (go)'
@@ -52,6 +54,7 @@ pull_request_rules:
       - check-success='build (1.16.x, macos-latest)'
       - check-success='build (1.17.x, macos-latest)'
       - check-success='lint (1.16.x, ubuntu-latest)'
+      - check-success='lint (1.17.x, ubuntu-latest)'
       - check-success='lint (1.16.x, macos-latest)'
       - check-success='lint (1.17.x, macos-latest)'
       - check-success='Analyze (go)'
@@ -191,7 +194,9 @@ pull_request_rules:
 
   - name: Close stale pull request
     conditions:
-      - base=master
+      - or:
+        - base=master
+        - base=v1
       - -closed
       - updated-at<21 days ago
     actions:
