@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The btcsuite developers
+// Copyright (c) 2021 The libsv developers
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
@@ -7,8 +7,7 @@ package bip32_test
 import (
 	"fmt"
 
-	"github.com/bitcoinsv/bsvd/chaincfg"
-	"github.com/bitcoinsv/bsvutil/hdkeychain"
+	"github.com/libsv/go-bk/chaincfg"
 
 	"github.com/libsv/go-bk/bip32"
 )
@@ -17,14 +16,14 @@ import (
 // then use it to create a new master node (extended key).
 func ExampleNewMaster() {
 	// Generate a random seed at the recommended length.
-	seed, err := bip32.GenerateSeed(hdkeychain.RecommendedSeedLen)
+	seed, err := bip32.GenerateSeed(bip32.RecommendedSeedLen)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Generate a new master node using the seed.
-	key, err := hdkeychain.NewMaster(seed, &chaincfg.MainNetParams)
+	key, err := bip32.NewMaster(seed, &chaincfg.MainNet)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -65,7 +64,7 @@ func Example_defaultWalletLayout() {
 	// Start by getting an extended key instance for the master node.
 	// This gives the path:
 	//   m
-	masterKey, err := hdkeychain.NewKeyFromString(master)
+	masterKey, err := bip32.NewKeyFromString(master)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -73,7 +72,7 @@ func Example_defaultWalletLayout() {
 
 	// Derive the extended key for account 0.  This gives the path:
 	//   m/0H
-	acct0, err := masterKey.Child(hdkeychain.HardenedKeyStart + 0)
+	acct0, err := masterKey.Child(bip32.HardenedKeyStart + 0)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -120,22 +119,14 @@ func Example_defaultWalletLayout() {
 
 	// Get and show the address associated with the extended keys for the
 	// main bitcoin	network.
-	acct0ExtAddr, err := acct0Ext10.Address(&chaincfg.MainNetParams)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	acct0IntAddr, err := acct0Int0.Address(&chaincfg.MainNetParams)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	acct0ExtAddr := acct0Ext10.Address(&chaincfg.MainNet)
+	acct0IntAddr := acct0Int0.Address(&chaincfg.MainNet)
 	fmt.Println("Account 0 External Address 10:", acct0ExtAddr)
 	fmt.Println("Account 0 Internal Address 0:", acct0IntAddr)
 
 	// Output:
-	// Account 0 External Address 10: qz6wkeydwnmhsf0w9ac4rwhnx8jmlqsp9yvnt5qaux
-	// Account 0 Internal Address 0: qzak20c4paxssre0a2zvgk8e0r22p06j9s20636fgv
+	// Account 0 External Address 10: 1HVccubUT8iKTapMJ5AnNA4sLRN27xzQ4F
+	// Account 0 Internal Address 0: 1J5rebbkQaunJTUoNVREDbeB49DqMNFFXk
 }
 
 // This example demonstrates the audits use case in BIP0032.
@@ -161,7 +152,7 @@ func Example_audits() {
 	// Start by getting an extended key instance for the master node.
 	// This gives the path:
 	//   m
-	masterKey, err := hdkeychain.NewKeyFromString(master)
+	masterKey, err := bip32.NewKeyFromString(master)
 	if err != nil {
 		fmt.Println(err)
 		return
