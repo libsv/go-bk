@@ -7,8 +7,6 @@ package bip32_test
 import (
 	"testing"
 
-	"github.com/bitcoinsv/bsvutil/hdkeychain"
-
 	"github.com/libsv/go-bk/bip32"
 )
 
@@ -28,7 +26,7 @@ func BenchmarkDeriveHardened(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		masterKey.Child(hdkeychain.HardenedKeyStart)
+		masterKey.Child(bip32.HardenedKeyStart)
 	}
 }
 
@@ -36,7 +34,7 @@ func BenchmarkDeriveHardened(b *testing.B) {
 // (non-hardened) child from a master private extended key.
 func BenchmarkDeriveNormal(b *testing.B) {
 	b.StopTimer()
-	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+	masterKey, err := bip32.NewKeyFromString(bip0032MasterPriv1)
 	if err != nil {
 		b.Errorf("Failed to decode master seed: %v", err)
 	}
@@ -51,7 +49,7 @@ func BenchmarkDeriveNormal(b *testing.B) {
 // key to a public extended key.
 func BenchmarkPrivToPub(b *testing.B) {
 	b.StopTimer()
-	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+	masterKey, err := bip32.NewKeyFromString(bip0032MasterPriv1)
 	if err != nil {
 		b.Errorf("Failed to decode master seed: %v", err)
 	}
@@ -66,7 +64,7 @@ func BenchmarkPrivToPub(b *testing.B) {
 // extended key.
 func BenchmarkDeserialise(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+		bip32.NewKeyFromString(bip0032MasterPriv1)
 	}
 }
 
@@ -74,7 +72,7 @@ func BenchmarkDeserialise(b *testing.B) {
 // extended key.
 func BenchmarkSerialise(b *testing.B) {
 	b.StopTimer()
-	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+	masterKey, err := bip32.NewKeyFromString(bip0032MasterPriv1)
 	if err != nil {
 		b.Errorf("Failed to decode master seed: %v", err)
 	}
